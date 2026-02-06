@@ -281,15 +281,106 @@
             font-size: 0.9rem;
         }
 
+        /* --- Timer Switcher Styles --- */
+        .timer-switcher {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            padding: 5px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        .switch-btn {
+            background: transparent;
+            color: #aaa;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            flex: 1;
+        }
+
+        .switch-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+        }
+
+        /* --- Container for Timer Modes --- */
+        .timer-mode-container {
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .timer-view {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .timer-view.active {
+            display: block;
+        }
+
+        /* --- Custom Timer Styles --- */
+        .custom-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .time-input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .time-input {
+            width: 70px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            color: white;
+            font-size: 1.5rem;
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        .time-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+        }
+
+        .time-input::-webkit-outer-spin-button,
+        .time-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .input-label {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
         .pomodoro-card {
             background: var(--glass);
             border: 1px solid var(--border);
             padding: 30px;
             border-radius: 20px;
             width: 100%;
-            max-width: 500px;
             margin-bottom: 20px;
             backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
 
         .pomo-time {
@@ -594,16 +685,58 @@
                 </div>
             </div>
         </section>
+
         <section id="planning" class="content-section">
-            <h2 style="margin-bottom: 20px;">⏳ تنظيم الوقت (Pomodoro)</h2>
-            <div class="pomodoro-card">
-                <div id="pomo-label" class="badge">جلسة تركيز</div>
-                <div id="pomo-display" class="pomo-time">25:00</div>
-                <div class="pomo-btns">
-                    <button id="pomo-start-btn" class="pomo-btn" onclick="togglePomo()">ابدأ</button>
-                    <button class="pomo-btn" style="background:var(--glass)" onclick="resetPomo()">إعادة</button>
-                    <button class="pomo-btn" style="background:#3b82f6"
-                        onclick="setPomo(5, 'استراحة قصيرة')">استراحة</button>
+            <h2 style="margin-bottom: 20px;">⏳ إدارة وقتك</h2>
+
+            <div class="timer-switcher">
+                <button id="btn-pomo-mode" class="switch-btn active" onclick="switchTimerMode('pomo')">Pomodoro</button>
+                <button id="btn-custom-mode" class="switch-btn" onclick="switchTimerMode('custom')">مؤقت </button>
+            </div>
+
+            <div class="timer-mode-container">
+                <div id="pomo-view" class="timer-view active">
+                    <div class="pomodoro-card">
+                        <div id="pomo-label" class="badge">جلسة تركيز</div>
+                        <div id="pomo-display" class="pomo-time">25:00</div>
+                        <div class="pomo-btns">
+                            <button id="pomo-start-btn" class="pomo-btn" onclick="togglePomo()">ابدأ</button>
+                            <button class="pomo-btn" style="background:var(--glass)" onclick="resetPomo()">إعادة</button>
+                            <button class="pomo-btn" style="background:#3b82f6"
+                                onclick="setPomo(5, 'استراحة قصيرة')">استراحة</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="custom-view" class="timer-view">
+                    <div class="pomodoro-card">
+                        <div class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">ضبط يدوي</div>
+
+                        <div class="custom-inputs" id="custom-inputs-div">
+                            <div class="time-input-group">
+                                <input type="number" id="c-hours" class="time-input" min="0" value="0">
+                                <span class="input-label">ساعة</span>
+                            </div>
+                            <span style="font-size:2rem; font-weight:bold">:</span>
+                            <div class="time-input-group">
+                                <input type="number" id="c-minutes" class="time-input" min="0" max="59" value="0">
+                                <span class="input-label">دقيقة</span>
+                            </div>
+                            <span style="font-size:2rem; font-weight:bold">:</span>
+                            <div class="time-input-group">
+                                <input type="number" id="c-seconds" class="time-input" min="0" max="59" value="0">
+                                <span class="input-label">ثانية</span>
+                            </div>
+                        </div>
+
+                        <div id="custom-display" class="pomo-time" style="display:none;">00:00:00</div>
+
+                        <div class="pomo-btns">
+                            <button id="custom-start-btn" class="pomo-btn" onclick="toggleCustomTimer()">ابدأ</button>
+                            <button class="pomo-btn" style="background:var(--glass)"
+                                onclick="resetCustomTimer()">اعادة</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -657,6 +790,25 @@
                 overlay.classList.remove('open');
             }
         }
+
+        
+        function switchTimerMode(mode) {
+            
+            if (isRunning) resetPomo();
+            if (isCustomRunning) resetCustomTimer();
+
+            
+            document.getElementById('btn-pomo-mode').classList.remove('active');
+            document.getElementById('btn-custom-mode').classList.remove('active');
+            document.getElementById(`btn-${mode}-mode`).classList.add('active');
+
+           
+            document.getElementById('pomo-view').classList.remove('active');
+            document.getElementById('custom-view').classList.remove('active');
+            document.getElementById(`${mode}-view`).classList.add('active');
+        }
+
+      
         let pomoInterval = null;
         let timeLeft = 25 * 60;
         let isRunning = false;
@@ -684,7 +836,7 @@
                         clearInterval(pomoInterval);
                         isRunning = false;
                         btn.innerText = "ابدأ";
-                        alert("انتهى الوقت!");
+                        alert("انتهى وقت البومودورو!");
                     }
                 }, 1000);
             }
@@ -708,7 +860,79 @@
             updatePomoDisplay();
         }
 
-        // --- Todo Logic ---
+        
+        let customInterval = null;
+        let customTimeLeft = 0;
+        let isCustomRunning = false;
+
+        function updateCustomDisplay() {
+            const h = Math.floor(customTimeLeft / 3600);
+            const m = Math.floor((customTimeLeft % 3600) / 60);
+            const s = customTimeLeft % 60;
+            document.getElementById('custom-display').innerText =
+                `${h < 10 ? '0' + h : h}:${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
+        }
+
+        function toggleCustomTimer() {
+            const btn = document.getElementById('custom-start-btn');
+            const inputsDiv = document.getElementById('custom-inputs-div');
+            const displayDiv = document.getElementById('custom-display');
+
+            if (!isCustomRunning && customTimeLeft === 0) {
+               
+                const h = parseInt(document.getElementById('c-hours').value) || 0;
+                const m = parseInt(document.getElementById('c-minutes').value) || 0;
+                const s = parseInt(document.getElementById('c-seconds').value) || 0;
+
+                customTimeLeft = (h * 3600) + (m * 60) + s;
+
+                if (customTimeLeft <= 0) {
+                    alert("الرجاء ضبط الوقت أولاً");
+                    return;
+                }
+
+                
+                inputsDiv.style.display = 'none';
+                displayDiv.style.display = 'block';
+                updateCustomDisplay();
+            }
+
+            if (isCustomRunning) {
+                
+                clearInterval(customInterval);
+                btn.innerText = "استئناف";
+                isCustomRunning = false;
+            } else {
+                
+                isCustomRunning = true;
+                btn.innerText = "توقف";
+                customInterval = setInterval(() => {
+                    if (customTimeLeft > 0) {
+                        customTimeLeft--;
+                        updateCustomDisplay();
+                    } else {
+                        clearInterval(customInterval);
+                        isCustomRunning = false;
+                        btn.innerText = "ابدأ";
+                        alert("انتهى الوقت المحدد!");
+                        resetCustomTimer(); 
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetCustomTimer() {
+            clearInterval(customInterval);
+            isCustomRunning = false;
+            customTimeLeft = 0;
+
+            document.getElementById('custom-start-btn').innerText = "ابدأ";
+            document.getElementById('custom-display').style.display = 'none';
+            document.getElementById('custom-inputs-div').style.display = 'flex';
+        }
+
+
+        
         function addTodo() {
             const input = document.getElementById('todo-in');
             if (!input.value.trim()) return;
@@ -815,7 +1039,6 @@
         }
         animate();
 
-        // --- قائمة الـ 200 مقولة التحفيزية الشاملة ---
         const dailyQuotes = [
             { text: "بقدر الكدِّ تكتسب المعالي ... ومن طلب العلا سهر الليالي.", author: "الإمام الشافعي" },
             { text: "وما نيل المطالب بالتمني ... ولكن تؤخذ الدنيا غلابا.", author: "أحمد شوقي" },
@@ -1039,6 +1262,3 @@
 
 
 </html>
-
-
-
